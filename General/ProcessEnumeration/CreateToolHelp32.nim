@@ -27,7 +27,6 @@ proc GetProcessIdFromName*(name: LPCSTR): DWORD =
 #[
 
 var explorerId = GetProcessIdFromName("explorer.exe")
-
 echo("Explorer Process Id: " , $explorerId)
 
 ]#
