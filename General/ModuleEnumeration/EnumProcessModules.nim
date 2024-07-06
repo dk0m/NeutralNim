@@ -7,16 +7,19 @@ proc toStringA(chars: openArray[CHAR]): string =
             break
         result.add((c))
 
-
-proc GetModuleInfo*(hProcess: HANDLE, targetModuleName: LPCSTR): MODULEINFO =
+proc GetProcessModules*(hProcess: HANDLE): seq[HMODULE] =
     var processModules: array[1024, HMODULE]
     var neededSize: DWORD
 
     EnumProcessModules(hProcess, &processModules[0], cast[DWORD](sizeof(processModules)), &neededSize)
 
     var amountOfModules = int(neededSize / sizeof(HMODULE))
-
     let procModules = processModules[0 .. amountOfModules]
+
+    return procModules
+
+proc GetModuleInfo*(hProcess: HANDLE, targetModuleName: LPCSTR): MODULEINFO =
+    let procModules = GetProcessModules(hProcess)
 
     for i in 0 .. sizeof(procModules):
 
