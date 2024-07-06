@@ -1,4 +1,4 @@
-import winim, ptr_math, ./MemScan, strutils
+import winim, ptr_math, strutils
 import ../ProcessEnumeration/CreateToolHelp32
 import ../ModuleEnumeration/EnumProcessModules
 
@@ -31,11 +31,10 @@ proc SigScan*(hProcess: HANDLE, startAddress: LPVOID, regionSize: SIZE_T, signat
 # Scanning For System Call Stubs #
 
 #[
-Use This For Assembling & Disassembling: https://defuse.ca/online-x86-assembler.htm#disassembly2
+Online x86 / x64 Assembler and Disassembler: https://defuse.ca/online-x86-assembler.htm#disassembly2
 
 var notepadId = GetProcessIdFromName("notepad.exe")
 var hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, notepadId)
-var memRegions = GetProcessMemoryRegions(hProcess)
 
 var ntdllInfo = GetModuleInfo(hProcess, "ntdll.dll")
 
