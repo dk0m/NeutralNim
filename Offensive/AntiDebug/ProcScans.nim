@@ -1,6 +1,6 @@
 import winim
 
-
+# Credit To ScyllaHide
 const
   BadProcessnameList: array[30, string] = [
     "ollydbg.exe",
