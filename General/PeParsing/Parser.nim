@@ -1,13 +1,29 @@
 import winim, os, ptr_math
 
 type
+    PeHeaders = object
+     DosHeader*: PIMAGE_DOS_HEADER
+     NtHeaders*: PIMAGE_NT_HEADERS
+     OptHeader*: IMAGE_OPTIONAL_HEADER
+     FileHeader*: IMAGE_FILE_HEADER
+
+    PeDirectories = object
+     ExportDirectory: PIMAGE_EXPORT_DIRECTORY
+     ImportDirectory: PIMAGE_IMPORT_DESCRIPTOR
+     TlsDirectory: PIMAGE_TLS_DIRECTORY
+     RelocsDirectory: PIMAGE_BASE_RELOCATION
+    
     PeFile = object
-     peBase*: DWORD_PTR
-     dosHeader*: PIMAGE_DOS_HEADER
-     ntHeaders*: PIMAGE_NT_HEADERS
-     optHeader*: IMAGE_OPTIONAL_HEADER
-     fileHeader*: IMAGE_FILE_HEADER
-     exportDirectory*: PIMAGE_EXPORT_DIRECTORY
+     ImageBase*: DWORD_PTR
+     Headers: PeHeaders
+     Directories: PeDirectories
+     Sections: seq[PIMAGE_SECTION_HEADER]
+
+proc toStringFromByteArray*(chars: openArray[BYTE]): string =
+    for c in chars:
+        if cast[char](c) == '\0':
+            break
+        result.add(cast[char](c))
 
 proc ReadPe*(filePath: LPCSTR): LPVOID =
     var peFile: HANDLE = CreateFileA(filePath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, cast[HANDLE](NULL))
@@ -31,29 +47,59 @@ proc ReadPe*(filePath: LPCSTR): LPVOID =
 proc GetCurrentPeBase*(): LPVOID =
     return cast[LPVOID](GetModuleHandleA(NULL))
 
+proc RvaToVa*[T](baseAddr: DWORD_PTR, offset: DWORD): T =
+    return cast[T](baseAddr + offset)
 
 proc parsePe*(pePath: LPCSTR): PeFile =
+    var peBase = cast[DWORD_PTR](ReadPe(pePath))
+    ## Headers ##
+    
+    var
+        dosHeader = cast[PIMAGE_DOS_HEADER](peBase)
+        ntHeaders = cast[PIMAGE_NT_HEADERS](peBase + dosHeader.e_lfanew)
+        optHeader = ntHeaders.OptionalHeader
+        fileHeader = ntHeaders.FileHeader
 
-    var peFileRead = ReadPe(pePath)
-    var peBase = cast[DWORD_PTR](peFileRead)
+    ## Directories ##
+    
+    var 
+        exportDirectory = RvaToVa[PIMAGE_EXPORT_DIRECTORY](peBase, optHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress)
+        importDirectory = RvaToVa[PIMAGE_IMPORT_DESCRIPTOR](peBase, optHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress)
+        tlsDirectory = RvaToVa[PIMAGE_TLS_DIRECTORY](peBase, optHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS].VirtualAddress)
+        relocsDirectory = RvaToVa[PIMAGE_BASE_RELOCATION](peBase, optHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress)
+    
+    ## Sections ##
+    
+    var 
+        peSections: seq[PIMAGE_SECTION_HEADER]
+        numbOfSections = fileHeader.NumberOfSections
+        fSectionHdr = RvaToVa[PIMAGE_SECTION_HEADER](cast[DWORD_PTR](ntHeaders), cast[DWORD](sizeof(IMAGE_NT_HEADERS)))
 
-    var dosHeader: PIMAGE_DOS_HEADER = cast[PIMAGE_DOS_HEADER](peBase)
-    var ntHeaders: PIMAGE_NT_HEADERS = cast[PIMAGE_NT_HEADERS](peBase + dosHeader.e_lfanew)
+    for i in 0..int(numbOfSections) - 1:
+        peSections.add(fSectionHdr)
+        fSectionHdr = RvaToVa[PIMAGE_SECTION_HEADER](cast[DWORD_PTR](fSectionHdr), cast[DWORD](sizeof(IMAGE_SECTION_HEADER)))
 
-    var optHeader: IMAGE_OPTIONAL_HEADER = ntHeaders.OptionalHeader
-    var fileHeader: IMAGE_FILE_HEADER = ntHeaders.FileHeader
+    ## Return PE ##
+    
+    return PeFile(
+        ImageBase: peBase,
+        Headers: PeHeaders(DosHeader: dosHeader, NtHeaders: ntHeaders, OptHeader: optHeader, FileHeader: fileHeader),
+        Directories: PeDirectories(ExportDirectory: exportDirectory, ImportDirectory: importDirectory, TlsDirectory: tlsDirectory, RelocsDirectory: relocsDirectory),
+        Sections: peSections
+    )
 
-    var expDataDir = optHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT]
 
-    var expDir: PIMAGE_EXPORT_DIRECTORY = cast[PIMAGE_EXPORT_DIRECTORY](peBase + expDataDir.VirtualAddress)
+# Parsing NTDLL PE Sections #
 
-    return PeFile(peBase: peBase, dosHeader: dosHeader, ntHeaders: ntHeaders, optHeader: optHeader, fileHeader: fileHeader, exportDirectory: expDir )
-
-
-# This Isn't a Full PE Parser, More Features Will Be Added, Section Parsing, IAT Parsing, Relocations, Etc #
-
-# Parsing NTDLL #
 #[
-var peNtdll = parsePe("C:\\Windows\\System32\\ntdll.dll")
-]#
+var pe = parsePe("C:\\Windows\\System32\\ntdll.dll")
 
+echo "-----------------"
+for section in pe.Sections:
+    echo "Section: " & toStringFromByteArray(section.Name)
+    echo "RVA: " & repr(cast[LPVOID](section.VirtualAddress))
+    echo "VA: " & repr(RvaToVa[LPVOID](pe.ImageBase, section.VirtualAddress))
+    echo "Characteristics: " & toHex(section.Characteristics)
+    echo "-----------------"
+
+]#
