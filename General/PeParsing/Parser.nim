@@ -8,16 +8,16 @@ type
      FileHeader*: IMAGE_FILE_HEADER
 
     PeDirectories = object
-     ExportDirectory: PIMAGE_EXPORT_DIRECTORY
-     ImportDirectory: PIMAGE_IMPORT_DESCRIPTOR
-     TlsDirectory: PIMAGE_TLS_DIRECTORY
-     RelocsDirectory: PIMAGE_BASE_RELOCATION
+     ExportDirectory*: PIMAGE_EXPORT_DIRECTORY
+     ImportDirectory*: PIMAGE_IMPORT_DESCRIPTOR
+     TlsDirectory*: PIMAGE_TLS_DIRECTORY
+     RelocsDirectory*: PIMAGE_BASE_RELOCATION
     
     PeFile = object
      ImageBase*: DWORD_PTR
-     Headers: PeHeaders
-     Directories: PeDirectories
-     Sections: seq[PIMAGE_SECTION_HEADER]
+     Headers*: PeHeaders
+     Directories*: PeDirectories
+     Sections*: seq[PIMAGE_SECTION_HEADER]
 
 proc toStringFromByteArray*(chars: openArray[BYTE]): string =
     for c in chars:
