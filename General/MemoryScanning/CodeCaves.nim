@@ -2,7 +2,9 @@ import winim, ../PeParsing/Parser
 
 type
     Cave* = object
-     Section*: string
+     Section*: PIMAGE_SECTION_HEADER
+     SectionName*: string
+     Size*: int
      RawAddress*: LPVOID
      VirtualAddress*: LPVOID
 
@@ -24,7 +26,9 @@ proc findCaves*(peNtdll: PeFile, minSize: int): seq[Cave] =
                     var caveVa = cast[LPVOID](peNtdll.Headers.OptHeader.ImageBase + ptrToData + i - freeBytes)
                     result.add(
                         Cave(
-                            Section: sectionName,
+                            Section: section,
+                            Size: freeBytes,
+                            SectionName: sectionName,
                             RawAddress: caveStartAddress,
                             VirtualAddress: caveVa
                         )
