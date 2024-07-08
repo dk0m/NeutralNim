@@ -1,6 +1,5 @@
 import winim, cligen, ../PeParsing/Parser
 
-
 proc fetchFileSize(filePath: string): DWORD =
     var peFile: HANDLE = CreateFileA(filePath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, cast[HANDLE](NULL))
     var peFileSize = GetFileSize(peFile, NULL)
@@ -28,5 +27,5 @@ proc NopAllInt3s(filePath: string, outputNopped: string, args: seq[string]) =
     var outputFile = CreateFileA(outputNopped, GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, cast[HANDLE](NULL))
     if WriteFile(outputFile, cast[LPVOID](peFile.ImageBase), fetchFileSize(filePath), NULL, NULL) == 1:
         echo("Wrote Nopped-Out Binary Successfully!")
-
+    CloseHandle(outputFile)
 dispatch NopAllInt3s
