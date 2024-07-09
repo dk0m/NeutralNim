@@ -47,7 +47,7 @@ proc disable*(hookObj: var ApiHook) =
 proc DetourMessageBoxA(hWnd: HWND, lpText: LPCSTR, lpCaption: LPCSTR, uType: UINT): BOOL =
     echo("lpText: " & $lpText)
     echo("lpCaption: " & $lpCaption)
-    return MessageBoxW(0, L"Get Hooked", "Hooked!", 0)
+    return MessageBoxW(0, L"Get Hooked", L"Hooked!", 0)
 
 # Example Of Usage #
 
