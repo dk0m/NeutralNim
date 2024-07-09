@@ -1,4 +1,4 @@
-import winim, os, ptr_math
+import winim, os, ptr_math, ./Types
 
 type
     PeHeaders = object
@@ -12,7 +12,8 @@ type
      ImportDirectory*: PIMAGE_IMPORT_DESCRIPTOR
      TlsDirectory*: PIMAGE_TLS_DIRECTORY
      RelocsDirectory*: PIMAGE_BASE_RELOCATION
-    
+     RtfEntryDirectory*: PIMAGE_RUNTIME_FUNCTION_ENTRY 
+
     PeFile = object
      ImageBase*: DWORD_PTR
      Headers*: PeHeaders
@@ -50,8 +51,8 @@ proc GetCurrentPeBase*(): LPVOID =
 proc RvaToVa*[T](baseAddr: DWORD_PTR, offset: DWORD): T =
     return cast[T](baseAddr + offset)
 
-proc parsePe*(pePath: LPCSTR): PeFile =
-    var peBase = cast[DWORD_PTR](ReadPe(pePath))
+proc parsePeFromImageBase*(peBase: PVOID): PeFile =
+    var peBase = cast[DWORD_PTR](peBase)
     ## Headers ##
     
     var
@@ -67,7 +68,8 @@ proc parsePe*(pePath: LPCSTR): PeFile =
         importDirectory = RvaToVa[PIMAGE_IMPORT_DESCRIPTOR](peBase, optHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress)
         tlsDirectory = RvaToVa[PIMAGE_TLS_DIRECTORY](peBase, optHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS].VirtualAddress)
         relocsDirectory = RvaToVa[PIMAGE_BASE_RELOCATION](peBase, optHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress)
-    
+        runtimeFuncEntryDirectory = RvaToVa[PIMAGE_RUNTIME_FUNCTION_ENTRY](peBase, optHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION].VirtualAddress)
+
     ## Sections ##
     
     var 
@@ -84,12 +86,19 @@ proc parsePe*(pePath: LPCSTR): PeFile =
     return PeFile(
         ImageBase: peBase,
         Headers: PeHeaders(DosHeader: dosHeader, NtHeaders: ntHeaders, OptHeader: optHeader, FileHeader: fileHeader),
-        Directories: PeDirectories(ExportDirectory: exportDirectory, ImportDirectory: importDirectory, TlsDirectory: tlsDirectory, RelocsDirectory: relocsDirectory),
+        Directories: PeDirectories(ExportDirectory: exportDirectory, ImportDirectory: importDirectory, TlsDirectory: tlsDirectory, RelocsDirectory: relocsDirectory, RtfEntryDirectory: runtimeFuncEntryDirectory),
         Sections: peSections
     )
 
 
 # Example Of Usage #
+
+proc parsePe*(peFilePath: LPCSTR): PeFile = 
+    var peBase = ReadPe(peFilePath)
+    return parsePeFromImageBase(peBase)
+
+proc parsePe*(peBase: PVOID): PeFile =
+    return parsePeFromImageBase(peBase)
 
 when isMainModule:
     var pe = parsePe("C:\\Windows\\System32\\ntdll.dll")
