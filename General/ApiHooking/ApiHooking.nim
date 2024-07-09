@@ -7,7 +7,8 @@ type
      hookFunction*: PVOID
      oldProtection*: DWORD
      orgBytes*: array[12, byte]
-     
+
+# Note: This is only x64 api hooking, hence the mov rax jmp rax byte array. 
 proc GetFuncAddr(moduleName: LPCSTR, procName: LPCSTR): PVOID =
     return PVOID(GetProcAddress(GetModuleHandleA(moduleName), procName))
 
@@ -17,7 +18,7 @@ proc newApiHook*(moduleName: LPCSTR, procedureName: LPCSTR, hookFunction: PVOID)
 
 proc enable*(hookObj: var ApiHook) = 
     var hookByteArray: array[12, byte] = [byte 0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0xFF, 0xE0]
-
+    
     var funcToHook = GetFuncAddr(hookObj.moduleName, hookObj.procedureName)
     var hookFunc = hookObj.hookFunction
 
@@ -37,6 +38,10 @@ proc disable*(hookObj: var ApiHook) =
     var hookedFunc = GetFuncAddr(hookObj.moduleName, hookObj.procedureName)
     var orgBytes = hookObj.orgBytes
     copyMem(hookedFunc, &orgBytes[0], sizeof(orgBytes))
+    var oldProtect: DWORD
+
+    VirtualProtect(hookedFunc, DWORD(sizeof(orgBytes)), hookObj.oldProtection, &oldProtect)
+    hookObj.oldProtection = oldProtect
 
 proc DetourMessageBoxA(hWnd: HWND, lpText: LPCSTR, lpCaption: LPCSTR, uType: UINT): BOOL =
     echo("lpText: " & $lpText)
