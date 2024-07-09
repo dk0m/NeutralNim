@@ -24,9 +24,7 @@ proc GetProcessIdFromName*(name: LPCSTR): DWORD =
 
 # Example Of Usage #
 
-#[
+when isMainModule:
+    var explorerId = GetProcessIdFromName("explorer.exe")
+    echo("Explorer Process Id: " , $explorerId)
 
-var explorerId = GetProcessIdFromName("explorer.exe")
-echo("Explorer Process Id: " , $explorerId)
-
-]#

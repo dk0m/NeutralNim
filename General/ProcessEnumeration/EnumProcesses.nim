@@ -34,13 +34,11 @@ proc GetProcessIdFromName*(name: LPCSTR): DWORD =
                 return currentId
 
 
+
 # Example Of Usage #
 
-#[
-
-var explorerId = GetProcessIdFromName("explorer.exe")
-echo("Explorer Process Id: " , $explorerId)
-
-]#
+when isMainModule:
+    var explorerId = GetProcessIdFromName("explorer.exe")
+    echo("Explorer Process Id: " , $explorerId)
 
 

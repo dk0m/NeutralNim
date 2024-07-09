@@ -38,10 +38,7 @@ proc GetModuleBaseAddress*(hProcess: HANDLE, targetModuleName: LPCSTR): PVOID =
 
 # Example Of Usage #
 
-#[
-
-var procId = GetProcessIdFromName("notepad.exe")
-var hProcess = OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ, FALSE, procId)
-echo GetModuleBaseAddress(hProcess, "ntdll.dll").repr()
-
-]#
+while isMainModule:
+    var procId = GetProcessIdFromName("notepad.exe")
+    var hProcess = OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ, FALSE, procId)
+    echo GetModuleBaseAddress(hProcess, "ntdll.dll").repr()

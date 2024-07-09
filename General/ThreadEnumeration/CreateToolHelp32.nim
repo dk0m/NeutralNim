@@ -19,12 +19,9 @@ proc GetProcessThreads*(hProcess: HANDLE): seq[THREADENTRY32] =
 
 # Example Of Usage #
 
-#[
-var hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetProcessIdFromName("notepad.exe"))
+when isMainModule:
+    var hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetProcessIdFromName("notepad.exe"))
+    var procThreads = GetProcessThreads(hProcess)
 
-var procThreads = GetProcessThreads(hProcess)
-
-for threadEntry in procThreads:
-    echo("Process Thread ID: " & $threadEntry.th32ThreadId)
-
-]#
+    for threadEntry in procThreads:
+        echo("Process Thread ID: " & $threadEntry.th32ThreadId)

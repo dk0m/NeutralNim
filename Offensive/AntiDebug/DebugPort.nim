@@ -16,7 +16,10 @@ proc IsBeingDebuggedFromDebugObjectHandle*(): bool =
     return processDOH != 0
 
 
-if IsBeingDebuggedFromDebugPort() or IsBeingDebuggedFromDebugFlags() or IsBeingDebuggedFromDebugObjectHandle():
-    echo("Process Is Being Debugged")
-else:
-    echo("Process Is Not Being Debugged")
+# Example Of Usage #
+
+when isMainModule:
+    if IsBeingDebuggedFromDebugPort() or IsBeingDebuggedFromDebugFlags() or IsBeingDebuggedFromDebugObjectHandle():
+        echo("Process Is Being Debugged")
+    else:
+        echo("Process Is Not Being Debugged")

@@ -62,7 +62,11 @@ proc CheckForBlackListedProcesses*(): bool =
     CloseHandle(processSnapshot)
     return false
 
-if CheckForBlackListedProcesses():
-    echo("Detected Debugger Processes!")
-else:
-    echo("Didn't Detect Debugger Processes")
+
+# Example Of Usage #
+
+when isMainModule:
+    if CheckForBlackListedProcesses():
+        echo("Detected Debugger Processes!")
+    else:
+        echo("Didn't Detect Debugger Processes")

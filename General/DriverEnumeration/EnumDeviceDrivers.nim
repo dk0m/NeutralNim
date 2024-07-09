@@ -27,21 +27,16 @@ proc GetDriverFileName*(driverBase: LPVOID): string =
     GetDeviceDriverFileNameA(driverBase, &drvFileName[0], cast[DWORD](sizeof(drvFileName)))
     return drvFileName.toStringA()
 
-# Example Of Usage #
+when isMainModule:
+    var drvs = GetDriversBases()
 
-#[
+    for drvBase in drvs:
+        var drvFileName = GetDriverFileName(drvBase)
+        var drvBaseName = GetDriverName(drvBase)
+        var drvBaseRepr = drvBase.repr()
 
-var drvs = GetDriversBases()
+        echo "Driver Base: " & drvBaseRepr
+        echo "Driver Name: " & drvBaseName
+        echo "Driver File Path: " & drvFileName
 
-for drvBase in drvs:
-    var drvFileName = GetDriverFileName(drvBase)
-    var drvBaseName = GetDriverName(drvBase)
-    var drvBaseRepr = drvBase.repr()
-
-    echo "Driver Base: ", drvBaseRepr
-    echo "Driver Name: ", drvBaseName
-    echo "Driver File Path: ", drvFileName
-
-    echo "---------------------"
-
-]#
+        echo "---------------------"

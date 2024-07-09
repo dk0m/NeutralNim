@@ -8,12 +8,15 @@ proc GetPeb*(): PPEB {.asmNoStackFrame.} =
     ret
     """
 
-var processPeb = GetPeb()
+# Example Of Usage #
 
-var processParams = processPeb.ProcessParameters
+when isMainModule:
+    var processPeb = GetPeb()
 
-var imagePathName = processParams.ImagePathName
-var commandLine = processParams.CommandLine
+    var processParams = processPeb.ProcessParameters
 
-echo "Image Path Name: " & $imagePathName.Buffer
-echo "Command Line: " & $commandLine.Buffer
+    var imagePathName = processParams.ImagePathName
+    var commandLine = processParams.CommandLine
+
+    echo "Image Path Name: " & $imagePathName.Buffer
+    echo "Command Line: " & $commandLine.Buffer

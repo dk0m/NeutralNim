@@ -19,7 +19,11 @@ proc NtGlobalFlag*(): bool =
 proc IsBeingDebugged*(): bool =
     return PebBeingDebugged() or NtGlobalFlag()
 
-if IsBeingDebugged():
-    echo("Process Is Being Debugged")
-else:
-    echo("Process Is Not Being Debugged")
+
+# Example Of Usage #
+
+when isMainModule:
+    if IsBeingDebugged():
+        echo("Process Is Being Debugged")
+    else:
+        echo("Process Is Not Being Debugged")

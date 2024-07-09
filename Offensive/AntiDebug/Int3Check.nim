@@ -24,7 +24,10 @@ proc CheckForBpsInCurrentModule*(): bool =
 
 # This Most Of The Time Raises False Positives, So Be Aware.
 
-if CheckForBpsInCurrentModule():
-    echo("Int3s Were Found In Current Module")
-else:
-    echo("Int3s Were Not Found In Current Module")
+# Example Of Usage #
+
+when isMainModule:
+    if CheckForBpsInCurrentModule():
+        echo("Int3s Were Found In Current Module")
+    else:
+        echo("Int3s Were Not Found In Current Module")

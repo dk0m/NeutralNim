@@ -49,7 +49,6 @@ echo $peEntryPoint
 if resultWrite == FALSE:
     echo("Failed To Write Shellcode To Cave!")
 
-
 # WORK IN PROGRESS #
 
 

@@ -89,17 +89,14 @@ proc parsePe*(pePath: LPCSTR): PeFile =
     )
 
 
-# Parsing NTDLL PE Sections #
+# Example Of Usage #
 
-#[
-var pe = parsePe("C:\\Windows\\System32\\ntdll.dll")
-
-echo "-----------------"
-for section in pe.Sections:
-    echo "Section: " & toStringFromByteArray(section.Name)
-    echo "RVA: " & repr(cast[LPVOID](section.VirtualAddress))
-    echo "VA: " & repr(RvaToVa[LPVOID](pe.ImageBase, section.VirtualAddress))
-    echo "Characteristics: " & toHex(section.Characteristics)
+when isMainModule:
+    var pe = parsePe("C:\\Windows\\System32\\ntdll.dll")
     echo "-----------------"
-
-]#
+    for section in pe.Sections:
+        echo "Section: " & toStringFromByteArray(section.Name)
+        echo "RVA: " & repr(cast[LPVOID](section.VirtualAddress))
+        echo "VA: " & repr(RvaToVa[LPVOID](pe.ImageBase, section.VirtualAddress))
+        echo "Characteristics: " & toHex(section.Characteristics)
+        echo "-----------------"

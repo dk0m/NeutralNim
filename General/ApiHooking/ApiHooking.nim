@@ -8,7 +8,8 @@ type
      oldProtection*: DWORD
      orgBytes*: array[12, byte]
 
-# Note: This is only x64 api hooking, hence the mov rax jmp rax byte array. 
+# Note: This is only x64 api hooking, hence the mov rax jmp rax byte array.
+ 
 proc GetFuncAddr(moduleName: LPCSTR, procName: LPCSTR): PVOID =
     return PVOID(GetProcAddress(GetModuleHandleA(moduleName), procName))
 

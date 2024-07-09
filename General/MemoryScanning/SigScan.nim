@@ -28,19 +28,15 @@ proc SigScan*(hProcess: HANDLE, startAddress: LPVOID, regionSize: SIZE_T, signat
             result.add(cast[LPVOID](cast[DWORD_PTR](startAddress) + offset))
         
 
-# Scanning For System Call Stubs #
+# Example Of Usage (Scanning For System Call Stubs) #
 
-#[
-Online x86 / x64 Assembler and Disassembler: https://defuse.ca/online-x86-assembler.htm#disassembly2
+when isMainModule:
+    var notepadId = GetProcessIdFromName("notepad.exe")
+    var hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, notepadId)
 
-var notepadId = GetProcessIdFromName("notepad.exe")
-var hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, notepadId)
+    var ntdllInfo = GetModuleInfo(hProcess, "ntdll.dll")
 
-var ntdllInfo = GetModuleInfo(hProcess, "ntdll.dll")
+    var foundSyscallStubs = SigScan(hProcess, ntdllInfo.lpBaseOfDll, ntdllInfo.SizeOfImage, "4C 8B D1 B8 ?? ?? ?? ?? F6")
 
-var foundSyscallStubs = SigScan(hProcess, ntdllInfo.lpBaseOfDll, ntdllInfo.SizeOfImage, "4C 8B D1 B8 ?? ?? ?? ?? F6")
-
-for stubAddress in foundSyscallStubs:
-    echo "Syscall Stub Found At " & repr(stubAddress)
-
-]#
+    for stubAddress in foundSyscallStubs:
+        echo "Syscall Stub Found At " & repr(stubAddress)

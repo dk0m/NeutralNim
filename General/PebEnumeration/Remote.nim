@@ -6,10 +6,12 @@ proc GetRemotePebAddress*(hProcess: HANDLE): PPEB =
     NtQueryInformationProcess(hProcess, processBasicInformation, &pbi, cast[ULONG](sizeof(pbi)), NULL)
     return pbi.PebBaseAddress
 
+# Example Of Usage #
 
-var procId = GetProcessIdFromName("notepad.exe")
-var hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, procId)
+when isMainModule:
+    var procId = GetProcessIdFromName("notepad.exe")
+    var hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, procId)
 
-var remPeb = GetRemotePebAddress(hProcess)
+    var remPeb = GetRemotePebAddress(hProcess)
 
-echo "Remote Peb Address: " & repr(cast[LPVOID](remPeb))
+    echo "Remote Peb Address: " & repr(cast[LPVOID](remPeb))

@@ -28,4 +28,5 @@ proc NopAllInt3s(filePath: string, outputNopped: string, args: seq[string]) =
     if WriteFile(outputFile, cast[LPVOID](peFile.ImageBase), fetchFileSize(filePath), NULL, NULL) == 1:
         echo("Wrote Nopped-Out Binary Successfully!")
     CloseHandle(outputFile)
+
 dispatch NopAllInt3s

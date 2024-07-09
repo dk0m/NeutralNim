@@ -52,26 +52,16 @@ var hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, notepadId)
 
 
 
-# Value Scan #
+# Example Of Usage #
 
+when isMainModule:
+    var memRegions = GetProcessMemoryRegions(hProcess)
+    var addresses = ScanFor[int](hProcess, memRegions, 4)
 
-#[
+    for addr in addresses:
+        echo "Found Value 4 At Address: ", addr.repr()
 
-var memRegions = GetProcessMemoryRegions(hProcess)
-var addresses = ScanFor[int](hProcess, memRegions, 4)
+    var strAddresses = ScanString(hProcess, memRegions, "VirtualAlloc")
 
-for addr in addresses:
-    echo "Found Value 4 At Address: ", addr.repr()
-]#
-
-
-# String Scan #
-
-#[
-
-var memRegions = GetProcessMemoryRegions(hProcess)
-var addresses = ScanString(hProcess, memRegions, "VirtualAlloc")
-for addr in addresses:
-    echo "Found String 'VirtualAlloc' At Address: ", addr.repr()
-]#
-
+    for addr in strAddresses:
+        echo "Found String 'VirtualAlloc' At Address: ", addr.repr()
