@@ -1,4 +1,4 @@
-import winim, os, ptr_math, ./Types
+import winim, os, ptr_math
 
 # Types #
 type
