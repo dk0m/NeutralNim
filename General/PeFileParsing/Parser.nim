@@ -1,4 +1,15 @@
-import winim, os, ptr_math, ./Types
+import winim, os, ptr_math
+
+# Types #
+type
+    IMAGE_RUNTIME_FUNCTION_ENTRY* = object
+     BeginAddress*: ULONG
+     EndAddress*: ULONG
+     ExceptionHandler*: PVOID
+     HandlerData*: PVOID
+     PrologEndAddress*: ULONG
+    
+    PIMAGE_RUNTIME_FUNCTION_ENTRY* = ptr IMAGE_RUNTIME_FUNCTION_ENTRY
 
 type
     PeHeaders = object
