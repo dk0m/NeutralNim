@@ -15,7 +15,7 @@ type
     PSYSTEM_FIRMWARE_TABLE_INFORMATION* = ptr SYSTEM_FIRMWARE_TABLE_INFORMATION
      
 
-proc GetSmbiosTable*(): PSYSTEM_FIRMWARE_TABLE_INFORMATION =
+proc GetSmbiosInfo*(): PSYSTEM_FIRMWARE_TABLE_INFORMATION =
 
     var bufferSize: ULONG = 65536
 
@@ -28,3 +28,10 @@ proc GetSmbiosTable*(): PSYSTEM_FIRMWARE_TABLE_INFORMATION =
     NtQuerySystemInformation(cast[SYSTEM_INFORMATION_CLASS](0x4c), firmwareTableInfo, bufferSize, &bufferSize)
 
     return firmwareTableInfo
+
+
+# Example Of Usage #
+
+when isMainModule:
+    var smbiosInfo = GetSmbiosInfo()
+    # Parse It And Fetch The UUID For Example # 
