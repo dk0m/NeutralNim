@@ -62,39 +62,40 @@ proc toStringW(chars: openArray[WCHAR]): string =
 
 template WLAN_SUCCESS*(status: DWORD): bool = status == ERROR_SUCCESS
 
-var negVersion: DWORD
-var wlanHandle: HANDLE
+when isMainModule:
+    var negVersion: DWORD
+    var wlanHandle: HANDLE
 
-WlanOpenHandle(
-    1,
-    NULL,
-    &negVersion,
-    &wlanHandle
-)
-var interfaceInfoList: PWLAN_INTERFACE_INFO_LIST
+    WlanOpenHandle(
+        1,
+        NULL,
+        &negVersion,
+        &wlanHandle
+    )
+    var interfaceInfoList: PWLAN_INTERFACE_INFO_LIST
 
-WlanEnumInterfaces(wlanHandle, NULL, &interfaceInfoList)
+    WlanEnumInterfaces(wlanHandle, NULL, &interfaceInfoList)
 
-for i in 0 ..< interfaceInfoList.dwNumberOfItems:
-    var interfaceInfo = interfaceInfoList.InterfaceInfo{i}
-    var interfaceGuid = interfaceInfo.InterfaceGuid
-    var profileList: PWLAN_PROFILE_INFO_LIST
+    for i in 0 ..< interfaceInfoList.dwNumberOfItems:
+        var interfaceInfo = interfaceInfoList.InterfaceInfo{i}
+        var interfaceGuid = interfaceInfo.InterfaceGuid
+        var profileList: PWLAN_PROFILE_INFO_LIST
 
-    WlanGetProfileList(wlanHandle, &interfaceGuid, NULL, &profileList)
+        WlanGetProfileList(wlanHandle, &interfaceGuid, NULL, &profileList)
 
-    for x in 0 .. profileList.dwNumberOfItems:
-        var profile = profileList.ProfileInfo{i}
-        var profileName = profile.strProfileName
-        var profileXml: LPWSTR
-        var profileFlags: DWORD = DWORD(0x4) # WLAN_PROFILE_GET_PLAINTEXT_KEY
-        WlanGetProfile(
-            wlanHandle,
-            &interfaceGuid,
-            cast[LPCWSTR](&profileName[0]),
-            NULL,
-            &profileXml,
-            &profileFlags,
-            NULL
-        )
+        for x in 0 .. profileList.dwNumberOfItems:
+            var profile = profileList.ProfileInfo{i}
+            var profileName = profile.strProfileName
+            var profileXml: LPWSTR
+            var profileFlags: DWORD = DWORD(0x4) # WLAN_PROFILE_GET_PLAINTEXT_KEY
+            WlanGetProfile(
+                wlanHandle,
+                &interfaceGuid,
+                cast[LPCWSTR](&profileName[0]),
+                NULL,
+                &profileXml,
+                &profileFlags,
+                NULL
+            )
 
-        echo($profileXml)
+            echo($profileXml)
