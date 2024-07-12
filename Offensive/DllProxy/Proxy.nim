@@ -1,4 +1,4 @@
-import ../../General/PeParsing/Parser, winim, ptr_math, cligen, strformat, strutils
+import ../../General/PeImageParsing/Parser, winim, ptr_math, cligen, strformat, strutils
 
 
 proc proxyDll*(dllPath: string, outputPath: string, suffix: string, args: seq[string]) = 

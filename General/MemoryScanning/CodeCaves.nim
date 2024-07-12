@@ -1,4 +1,4 @@
-import winim, ../PeParsing/Parser
+import winim, ../PeFileParsing/Parser
 
 type
     Cave* = object

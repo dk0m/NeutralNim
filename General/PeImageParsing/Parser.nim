@@ -2,13 +2,15 @@ import winim, os, ptr_math
 
 # Types #
 type
-    IMAGE_RUNTIME_FUNCTION_ENTRY* = object
-     BeginAddress*: ULONG
-     EndAddress*: ULONG
-     ExceptionHandler*: PVOID
-     HandlerData*: PVOID
-     PrologEndAddress*: ULONG
+    IMAGE_RUNTIME_FUNCTION_ENTRY_UNION* {.pure, union.} = object
+        UnwindInfoAddress*: DWORD
+        UnwindData*: DWORD
     
+    IMAGE_RUNTIME_FUNCTION_ENTRY* {.pure.} = object
+        BeginAddress*: DWORD
+        EndAddress*: DWORD
+        u1*: IMAGE_RUNTIME_FUNCTION_ENTRY_UNION
+
     PIMAGE_RUNTIME_FUNCTION_ENTRY* = ptr IMAGE_RUNTIME_FUNCTION_ENTRY
 
 type
@@ -102,17 +104,11 @@ proc parsePeFromImageBase*(peBase: PVOID): PeFile =
     )
 
 
-# Example Of Usage #
-
-proc parsePe*(peFilePath: LPCSTR): PeFile = 
-    var peBase = ReadPe(peFilePath)
-    return parsePeFromImageBase(peBase)
-
 proc parsePe*(peBase: PVOID): PeFile =
     return parsePeFromImageBase(peBase)
 
 when isMainModule:
-    var pe = parsePe("C:\\Windows\\System32\\ntdll.dll")
+    var pe = parsePe(GetCurrentPeBase())
     echo "-----------------"
     for section in pe.Sections:
         echo "Section: " & toStringFromByteArray(section.Name)
