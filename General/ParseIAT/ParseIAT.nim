@@ -1,4 +1,4 @@
-import winim, ../../General/PeImageParsing/Parser, ptr_math
+import winim, ./PeImageParsing/Parser, ptr_math
 
 # from PeFileParsing but edited a little bit.
 type 
