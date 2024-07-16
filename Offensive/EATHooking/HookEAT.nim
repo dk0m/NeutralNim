@@ -1,4 +1,4 @@
-# goal, find function -> get its rva -> change it to OUR function RVA (calculated by funcAddr - peBase)
+# Thanks To: https://www.codereversing.com/archives/598
 
 import ../../General/PeImageParsing/Parser, winim, ptr_math, os
 
