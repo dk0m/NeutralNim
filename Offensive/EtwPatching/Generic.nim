@@ -25,9 +25,9 @@ proc PatchAllEtwFunctions*() =
     echo("EEWF: " & cast[PVOID](EEWF).repr())
 
     if PatchEtwFunction(EEW) and PatchEtwFunction(EEWF):
-        echo("Patched All Etw Functions")
+        echo("Patched Etw Functions")
     else:
-        echo("Failed To Etw Functions")
+        echo("Failed To Patch Etw Functions")
 
 PatchAllEtwFunctions()
 
